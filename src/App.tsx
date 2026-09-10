@@ -10,6 +10,7 @@ import {
 } from './types';
 import { StorageService } from './services/storage';
 import { NotificationService } from './services/notifications';
+import { ThemeService } from './services/theme';
 import { SplashIntro } from './components/SplashIntro';
 import { OnboardingModal } from './components/OnboardingModal';
 import { PinLockModal } from './components/PinLockModal';
@@ -44,30 +45,7 @@ export default function App() {
 
   // Theme Sync with HTML document element
   useEffect(() => {
-    const root = document.documentElement;
-    const applyTheme = () => {
-      if (settings.theme === 'dark') {
-        root.classList.add('dark');
-      } else if (settings.theme === 'light') {
-        root.classList.remove('dark');
-      } else {
-        // System preference
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          root.classList.add('dark');
-        } else {
-          root.classList.remove('dark');
-        }
-      }
-    };
-
-    applyTheme();
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const listener = () => {
-      if (settings.theme === 'system') applyTheme();
-    };
-    mediaQuery.addEventListener('change', listener);
-    return () => mediaQuery.removeEventListener('change', listener);
+    ThemeService.applyTheme(settings.theme);
   }, [settings.theme]);
 
   // Notifications scheduler
@@ -82,6 +60,9 @@ export default function App() {
 
   // Update Settings
   const handleUpdateSettings = (updates: Partial<UserSettings>) => {
+    if (updates.theme) {
+      ThemeService.applyTheme(updates.theme);
+    }
     const updated = StorageService.updateSettings(updates);
     setSettings(updated);
   };
@@ -239,6 +220,8 @@ export default function App() {
         {currentTab === 'settings' && (
           <SettingsView
             settings={settings}
+            entries={entries}
+            reflections={reflections}
             onUpdateSettings={handleUpdateSettings}
             onResetAllData={handleResetAllData}
             onResetPreferences={handleResetPreferences}

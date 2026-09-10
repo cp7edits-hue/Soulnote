@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { UserSettings } from '../types';
+import { UserSettings, EmotionEntry, ReflectionEntry } from '../types';
 import { StorageService } from '../services/storage';
 import { NotificationService } from '../services/notifications';
 import { Haptics } from '../services/haptics';
+import { ThemeService } from '../services/theme';
+import { downloadTxtExport, downloadPdfExport } from '../services/export';
 import {
   Bell,
   Sun,
@@ -16,14 +18,17 @@ import {
   ShieldCheck,
   Info,
   Film,
-  Database,
   Check,
   AlertTriangle,
   Fingerprint,
+  FileText,
+  FileDown,
 } from 'lucide-react';
 
 interface SettingsViewProps {
   settings: UserSettings;
+  entries: EmotionEntry[];
+  reflections: ReflectionEntry[];
   onUpdateSettings: (updates: Partial<UserSettings>) => void;
   onResetAllData: () => void;
   onResetPreferences: () => void;
@@ -35,6 +40,8 @@ interface SettingsViewProps {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   settings,
+  entries,
+  reflections,
   onUpdateSettings,
   onResetAllData,
   onResetPreferences,
@@ -95,6 +102,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   // Theme change
   const handleSelectTheme = (theme: 'system' | 'light' | 'dark') => {
     Haptics.selection();
+    ThemeService.applyTheme(theme);
     onUpdateSettings({ theme });
   };
 
@@ -126,34 +134,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setShowPinSetup(false);
   };
 
-  // Export JSON
-  const handleExportJson = () => {
+  // Export TXT
+  const handleExportTxt = () => {
     Haptics.selection();
-    const jsonStr = StorageService.exportAllDataJson();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `soulnote_journal_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-    setExportNotice('JSON journal data downloaded successfully.');
+    downloadTxtExport(entries, reflections);
+    setExportNotice('TXT journal exported successfully.');
     setTimeout(() => setExportNotice(''), 4000);
   };
 
-  // Export CSV
-  const handleExportCsv = () => {
+  // Export PDF
+  const handleExportPdf = () => {
     Haptics.selection();
-    const csvStr = StorageService.exportEntriesCsv();
-    const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `soulnote_entries_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-    setExportNotice('CSV entries exported successfully.');
-    setTimeout(() => setExportNotice(''), 4000);
+    try {
+      downloadPdfExport(entries, reflections);
+      setExportNotice('PDF journal exported successfully.');
+      setTimeout(() => setExportNotice(''), 4000);
+    } catch (err) {
+      console.error('Error generating PDF export:', err);
+      alert('Unable to generate PDF journal. Please try again.');
+    }
   };
 
   // Delete All Data
@@ -285,6 +284,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             );
           })}
         </div>
+
+        <p className="text-xs text-[#6F6D67] dark:text-[#9A9890] leading-relaxed">
+          {settings.theme === 'system'
+            ? 'Automatically matches your device or OS appearance. SoulNote adjusts when your system switches.'
+            : settings.theme === 'light'
+            ? 'SoulNote is set to light appearance with soft warm paper tones.'
+            : 'SoulNote is set to dark appearance with deep, eye-resting contrast.'}
+        </p>
       </section>
 
       {/* 3. HAPTICS & TACTILE FEEDBACK */}
@@ -418,36 +425,38 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         )}
       </section>
 
-      {/* 5. DATA EXPORT & OWNERSHIP */}
+      {/* 5. DATA & PRIVACY: EXPORT DATA */}
       <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] space-y-4">
         <div className="flex items-center gap-2">
           <Download className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
           <h2 className="font-serif text-lg font-medium text-[#1E1E1C] dark:text-[#EDEDEB]">
-            Data Export & Ownership
+            Export Data
           </h2>
         </div>
 
-        <p className="text-xs text-[#6F6D67] dark:text-[#9A9890]">
-          Export your entire journal history at any time. SoulNote uses open, readable formats (JSON and CSV) so your emotional notes never get locked in.
+        <p className="text-xs text-[#6F6D67] dark:text-[#9A9890] leading-relaxed">
+          Export your personal journal and reflections at any time in clean, human-readable TXT or a formatted, printer-friendly PDF. All exports are generated 100% locally and privately on your device.
         </p>
 
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <button
             type="button"
-            onClick={handleExportJson}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#B5B2A6] transition-colors cursor-pointer"
+            id="export-txt-btn"
+            onClick={handleExportTxt}
+            className="inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
           >
-            <Database className="w-3.5 h-3.5" />
-            <span>Export Complete JSON</span>
+            <FileText className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
+            <span>Export as TXT</span>
           </button>
 
           <button
             type="button"
-            onClick={handleExportCsv}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#B5B2A6] transition-colors cursor-pointer"
+            id="export-pdf-btn"
+            onClick={handleExportPdf}
+            className="inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export CSV Spreadsheet</span>
+            <FileDown className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
+            <span>Export as PDF</span>
           </button>
         </div>
       </section>
