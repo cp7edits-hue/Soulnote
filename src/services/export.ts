@@ -190,6 +190,34 @@ export function generateTxtExport(entries: EmotionEntry[], reflections: Reflecti
 }
 
 /**
+ * Triggers a browser download of all journal entries from localStorage as a single JSON file.
+ * 100% client-side, zero backend involved.
+ */
+export function downloadJsonExport(entries: EmotionEntry[], reflections: ReflectionEntry[] = []): void {
+  const exportPayload = {
+    app: 'SoulNote',
+    version: '1.0.0',
+    storage: 'localStorage',
+    exportedAt: new Date().toISOString(),
+    totalEntries: entries.length,
+    totalReflections: reflections.length,
+    entries,
+    reflections,
+  };
+  const jsonStr = JSON.stringify(exportPayload, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const dateStamp = new Date().toISOString().split('T')[0];
+  link.href = url;
+  link.download = `soulnote_entries_${dateStamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/**
  * Triggers a browser download of the TXT file.
  */
 export function downloadTxtExport(entries: EmotionEntry[], reflections: ReflectionEntry[]): void {

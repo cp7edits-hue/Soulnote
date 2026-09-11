@@ -192,14 +192,27 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
 
           {/* Reflection Writing Box */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] shadow-2xs space-y-4">
-            <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#7C7A75] dark:text-[#8E8C85]">
-              Your Private Thoughts
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#7C7A75] dark:text-[#8E8C85]">
+                Your Private Thoughts
+              </label>
+              <span className="text-[11px] text-[#7A7872] dark:text-[#8E8C85]">
+                ⌘ + Enter to save
+              </span>
+            </div>
 
             <textarea
               id="reflection-editor"
               value={reflectionText}
               onChange={(e) => setReflectionText(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  if (reflectionText.trim() && currentPrompt.trim()) {
+                    e.preventDefault();
+                    handleSave();
+                  }
+                }
+              }}
               placeholder="Write freely. No AI reads this. No algorithms grade this. It belongs entirely to you."
               rows={6}
               className="w-full text-sm sm:text-base leading-relaxed p-4 rounded-2xl bg-[#FAF9F5] dark:bg-[#1C1C19] border border-[#E4E2D8] dark:border-[#2A2A26] text-[#1E1E1C] dark:text-[#EDEDEB] placeholder:text-[#9D9B94] dark:placeholder:text-[#64635E] focus:outline-hidden focus:ring-1 focus:ring-[#1E1E1C] dark:focus:ring-[#EDEDEB] resize-none"
@@ -215,7 +228,7 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
                 id="save-reflection-btn"
                 disabled={!reflectionText.trim() || !currentPrompt.trim()}
                 onClick={handleSave}
-                className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-medium text-xs tracking-wide transition-all shadow-xs cursor-pointer ${
+                className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-medium text-xs tracking-wide transition-all shadow-xs cursor-pointer min-h-[44px] ${
                   reflectionText.trim() && currentPrompt.trim()
                     ? 'bg-[#1E1E1C] hover:bg-[#32322E] dark:bg-[#EDEDEB] dark:hover:bg-white text-[#FBFBFA] dark:text-[#121211] active:scale-98'
                     : 'bg-[#E4E2D8] dark:bg-[#252522] text-[#9E9C95] dark:text-[#686660] cursor-not-allowed'

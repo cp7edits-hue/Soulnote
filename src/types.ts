@@ -54,6 +54,7 @@ export interface UserSettings {
   appLockEnabled: boolean;
   appLockPin: string; // 4-digit PIN if enabled
   useBiometricsIfAvailable: boolean;
+  hasSeenStorageNotice?: boolean;
 }
 
-export type NavigationTab = 'home' | 'timeline' | 'trends' | 'reflection' | 'settings';
+export type NavigationTab = 'home' | 'timeline' | 'trends' | 'reflection' | 'settings' | 'privacy';

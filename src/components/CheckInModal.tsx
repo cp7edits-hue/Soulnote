@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   PrimaryEmotion,
@@ -12,7 +12,7 @@ import {
   CONTEXT_TAGS,
   getEmotionMeta,
 } from '../data/emotions';
-import { X, Check, ArrowLeft } from 'lucide-react';
+import { X, Check, ArrowLeft, Sparkles } from 'lucide-react';
 import { Haptics } from '../services/haptics';
 
 interface CheckInModalProps {
@@ -46,6 +46,23 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   const [showOptionalDetails, setShowOptionalDetails] = useState<boolean>(
     Boolean(initialData?.tags?.length || initialData?.note)
   );
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        if (selectedEmotion && !isSaving) {
+          e.preventDefault();
+          handleSave();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, selectedEmotion, isSaving, intensity, selectedTags, note]);
 
   if (!isOpen) return null;
 
@@ -69,15 +86,19 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   };
 
   const handleSave = () => {
-    if (!selectedEmotion) return;
+    if (!selectedEmotion || isSaving) return;
     Haptics.success();
-    onSave({
-      emotion: selectedEmotion,
-      intensity,
-      tags: selectedTags,
-      note: note.trim() || undefined,
-    });
-    onClose();
+    setIsSaving(true);
+    setTimeout(() => {
+      onSave({
+        emotion: selectedEmotion,
+        intensity,
+        tags: selectedTags,
+        note: note.trim() || undefined,
+      });
+      onClose();
+      setIsSaving(false);
+    }, 180);
   };
 
   const selectedMeta = selectedEmotion ? getEmotionMeta(selectedEmotion) : null;
@@ -281,25 +302,42 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-[#6F6D67] hover:text-[#1E1E1C] dark:text-[#8E8C85] dark:hover:text-[#EDEDEB] transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-medium text-[#5F5D57] hover:text-[#1E1E1C] dark:text-[#A6A49D] dark:hover:text-[#EDEDEB] transition-colors cursor-pointer min-h-[44px] inline-flex items-center justify-center"
           >
             Cancel
           </button>
 
-          <button
-            type="button"
-            id="save-checkin-btn"
-            disabled={!selectedEmotion}
-            onClick={handleSave}
-            className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium text-xs tracking-wide transition-all shadow-xs cursor-pointer ${
-              selectedEmotion
-                ? 'bg-[#1E1E1C] hover:bg-[#32322E] dark:bg-[#EDEDEB] dark:hover:bg-[#FFFFFF] text-[#FBFBFA] dark:text-[#121211] active:scale-98'
-                : 'bg-[#E0DED7] dark:bg-[#252522] text-[#9E9C95] dark:text-[#686660] cursor-not-allowed'
-            }`}
-          >
-            <Check className="w-4 h-4" />
-            <span>{initialData ? 'Save Changes' : 'Save Check-in'}</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-[#7A7872] dark:text-[#8E8C85] hidden sm:inline">
+              ⌘ + Enter to save
+            </span>
+            <motion.button
+              type="button"
+              id="save-checkin-btn"
+              disabled={!selectedEmotion || isSaving}
+              onClick={handleSave}
+              animate={isSaving ? { scale: [1, 0.94, 1.08, 1] } : {}}
+              transition={{ duration: 0.22, ease: 'easeInOut' }}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium text-xs tracking-wide transition-all shadow-xs cursor-pointer min-h-[44px] ${
+                selectedEmotion
+                  ? 'bg-[#1E1E1C] hover:bg-[#32322E] dark:bg-[#EDEDEB] dark:hover:bg-[#FFFFFF] text-[#FBFBFA] dark:text-[#121211] active:scale-98'
+                  : 'bg-[#E0DED7] dark:bg-[#252522] text-[#9E9C95] dark:text-[#686660] cursor-not-allowed'
+              }`}
+            >
+              {isSaving ? (
+                <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
+              <span>
+                {isSaving
+                  ? 'Saving...'
+                  : initialData
+                  ? 'Save Changes'
+                  : 'Save Check-in'}
+              </span>
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </div>

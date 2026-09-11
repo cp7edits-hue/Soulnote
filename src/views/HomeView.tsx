@@ -1,9 +1,14 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { EmotionEntry, NavigationTab } from '../types';
 import { getEmotionMeta, INTENSITY_LABELS } from '../data/emotions';
 import { CURATED_REFLECTION_PROMPTS } from '../data/reflectionPrompts';
 import { Plus, ArrowRight, Clock, Sparkles, Heart } from 'lucide-react';
 import { Haptics } from '../services/haptics';
+import { calculateStreak } from '../utils/streak';
+import { StreakCard } from '../components/StreakCard';
+import { MoodOverTimeChart } from '../components/MoodOverTimeChart';
+import { EmptyStateJournal } from '../components/EmptyStateJournal';
 
 interface HomeViewProps {
   entries: EmotionEntry[];
@@ -50,8 +55,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
       ? (totalIntensity / last7DaysEntries.length).toFixed(1)
       : null;
 
+  // Consecutive-day streak calculation (100% client-side from local entries)
+  const streakStats = calculateStreak(entries);
+
   return (
-    <div id="soulnote-home-view" className="space-y-8 pb-16 max-w-xl mx-auto">
+    <div id="soulnote-home-view" className="space-y-7 pb-16 max-w-xl mx-auto">
       {/* 1. Date & Today's Status Header */}
       <section className="space-y-2 pt-2">
         <div className="flex items-center justify-between text-xs text-[#7C7A75] dark:text-[#8E8C85]">
@@ -95,7 +103,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 2. Large Primary "Check in" CTA Action */}
+      {/* 2. Streak Counter (Lightweight, computed client-side) */}
+      <section>
+        <StreakCard streak={streakStats} onOpenCheckIn={onOpenCheckIn} />
+      </section>
+
+      {/* 3. Large Primary "Check in" CTA Action */}
       <section>
         <button
           type="button"
@@ -148,17 +161,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {recentEntries.length === 0 ? (
-          <div className="p-8 rounded-3xl bg-[#F5F4F0] dark:bg-[#181816] border border-[#E8E6DF] dark:border-[#262622] text-center space-y-3">
-            <p className="text-sm text-[#5F5D57] dark:text-[#A6A49D]">
-              “Your emotional story starts here.”
-            </p>
-            <p className="text-xs text-[#8E8C85] dark:text-[#7A7872] max-w-xs mx-auto">
-              Tap the Check In button above to record your first emotion. It only takes a few seconds.
-            </p>
-          </div>
+          <EmptyStateJournal onOpenCheckIn={onOpenCheckIn} />
         ) : (
           <div className="space-y-2.5">
-            {recentEntries.map((entry) => {
+            {recentEntries.map((entry, index) => {
               const meta = getEmotionMeta(entry.emotion);
               const dateObj = new Date(entry.createdAt);
               const timeStr = dateObj.toLocaleTimeString([], {
@@ -168,14 +174,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
               const isToday = entry.dateKey === todayKey;
 
               return (
-                <button
+                <motion.button
                   key={entry.id}
                   type="button"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.28,
+                    delay: index * 0.05,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   onClick={() => {
                     Haptics.selection();
                     onSelectEntry(entry);
                   }}
-                  className="w-full text-left p-4 rounded-2xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] hover:border-[#D5D2C7] dark:hover:border-[#383832] transition-all cursor-pointer shadow-2xs group flex items-start justify-between gap-3"
+                  className="w-full text-left p-4 rounded-2xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] hover:border-[#D5D2C7] dark:hover:border-[#383832] transition-all cursor-pointer shadow-2xs group flex items-start justify-between gap-3 min-h-[44px]"
                 >
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -220,14 +233,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       Open →
                     </span>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
         )}
       </section>
 
-      {/* 4. Small Useful Summary */}
+      {/* 4. Mood Over Time Chart (recharts, local entries) */}
+      <section>
+        <MoodOverTimeChart entries={entries} onOpenCheckIn={onOpenCheckIn} />
+      </section>
+
+      {/* 5. Small Useful Summary */}
       {entries.length > 0 && (
         <section className="p-5 rounded-3xl bg-[#F5F4F0] dark:bg-[#181816] border border-[#E8E6DF] dark:border-[#262622] space-y-3">
           <div className="flex items-center justify-between">

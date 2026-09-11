@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, EmotionEntry, ReflectionEntry } from '../types';
 import { StorageService } from '../services/storage';
-import { NotificationService } from '../services/notifications';
 import { Haptics } from '../services/haptics';
 import { ThemeService } from '../services/theme';
-import { downloadTxtExport, downloadPdfExport } from '../services/export';
+import { downloadTxtExport, downloadPdfExport, downloadJsonExport } from '../services/export';
 import {
-  Bell,
   Sun,
   Moon,
   Monitor,
@@ -34,6 +32,7 @@ interface SettingsViewProps {
   onResetPreferences: () => void;
   onReplayIntro: () => void;
   onSeedSampleData: () => void;
+  onOpenPrivacy?: () => void;
   entriesCount: number;
   reflectionsCount: number;
 }
@@ -47,6 +46,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onResetPreferences,
   onReplayIntro,
   onSeedSampleData,
+  onOpenPrivacy,
   entriesCount,
   reflectionsCount,
 }) => {
@@ -152,6 +152,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     } catch (err) {
       console.error('Error generating PDF export:', err);
       alert('Unable to generate PDF journal. Please try again.');
+    }
+  };
+
+  // Export JSON (Raw from localStorage)
+  const handleExportJson = () => {
+    Haptics.selection();
+    try {
+      downloadJsonExport(entries, reflections);
+      setExportNotice('Raw journal entries downloaded as a JSON file.');
+      setTimeout(() => setExportNotice(''), 4000);
+    } catch (err) {
+      console.error('Error exporting JSON:', err);
+      alert('Unable to export JSON entries.');
     }
   };
 
@@ -435,17 +448,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         <p className="text-xs text-[#6F6D67] dark:text-[#9A9890] leading-relaxed">
-          Export your personal journal and reflections at any time in clean, human-readable TXT or a formatted, printer-friendly PDF. All exports are generated 100% locally and privately on your device.
+          Download your complete journal entries and reflections directly from localStorage. No cloud servers or backends involved.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <button
+            type="button"
+            id="export-json-btn"
+            onClick={handleExportJson}
+            className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
+            title="Download all journal entries from localStorage as a single JSON file"
+          >
+            <Download className="w-3.5 h-3.5 text-[#7C7A75] dark:text-[#8E8C85]" />
+            <span>Export (JSON)</span>
+          </button>
+
           <button
             type="button"
             id="export-txt-btn"
             onClick={handleExportTxt}
-            className="inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
+            className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
           >
-            <FileText className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
+            <FileText className="w-3.5 h-3.5 text-[#7C7A75] dark:text-[#8E8C85]" />
             <span>Export as TXT</span>
           </button>
 
@@ -453,9 +477,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             id="export-pdf-btn"
             onClick={handleExportPdf}
-            className="inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
+            className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl border border-[#E0DDD3] dark:border-[#2E2E2A] bg-[#FAF9F5] dark:bg-[#1E1E1B] text-xs font-medium text-[#2D2C2A] dark:text-[#DFDDD7] hover:border-[#1E1E1C] dark:hover:border-[#EDEDEB] hover:bg-white dark:hover:bg-[#252522] transition-all cursor-pointer shadow-2xs"
           >
-            <FileDown className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
+            <FileDown className="w-3.5 h-3.5 text-[#7C7A75] dark:text-[#8E8C85]" />
             <span>Export as PDF</span>
           </button>
         </div>
@@ -627,6 +651,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <li><strong>Completely Free Forever:</strong> No subscriptions, premium plans, paywalls, or gated features.</li>
           <li><strong>Non-Judgmental:</strong> Emotions are valid signals, never categorized as good or bad.</li>
         </ul>
+
+        {onOpenPrivacy && (
+          <div className="pt-2">
+            <button
+              type="button"
+              id="settings-read-privacy-policy-btn"
+              onClick={() => {
+                Haptics.selection();
+                onOpenPrivacy();
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1E1E1C] dark:text-[#EDEDEB] hover:underline cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Read Full Privacy Policy (/privacy) →</span>
+            </button>
+          </div>
+        )}
 
         <div className="pt-2 border-t border-[#EAE8E1] dark:border-[#22221F] text-[11px] text-[#7C7A75] dark:text-[#8E8C85] leading-relaxed">
           <strong>Medical Disclaimer:</strong> SoulNote is an emotional self-reflection tool. It does not diagnose, treat, or evaluate medical or psychiatric conditions, and is not a substitute for professional mental health therapy.

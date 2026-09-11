@@ -10,6 +10,14 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="google-site-verification" content="obRoX7TGnQMgaIyzL-vUXSlL3_3eQzg_SyyswmXIKv4" />
+    <meta name="theme-color" content="#1E1E1C" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SoulNote" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,6 +42,34 @@
   <body class="bg-[#FBFBFA] dark:bg-[#121211] text-[#1E1E1C] dark:text-[#EDEDEB] font-sans antialiased selection:bg-[#E8E6DF] dark:selection:bg-[#2C2C29]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        window.addEventListener('load', function() {
+          var isDev = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' || 
+                      window.location.port === '3000';
+          if (isDev) {
+            // Unregister any stale service workers in dev to prevent module cache poisoning
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              for (var reg of registrations) {
+                reg.unregister();
+              }
+            });
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                for (var name of names) {
+                  caches.delete(name);
+                }
+              });
+            }
+          } else {
+            navigator.serviceWorker.register('/sw.js').catch(function(err) {
+              console.log('ServiceWorker registration skipped or failed:', err);
+            });
+          }
+        });
+      }
+    </script>
   </body>
 </html>
 

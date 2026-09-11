@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   appLockEnabled: false,
   appLockPin: '',
   useBiometricsIfAvailable: false,
+  hasSeenStorageNotice: false,
 };
 
 export const StorageService = {
@@ -176,6 +177,28 @@ export const StorageService = {
     const updated = { ...current, ...updates };
     this.saveSettings(updated);
     return updated;
+  },
+
+  hasSeenStorageNotice(): boolean {
+    try {
+      return (
+        localStorage.getItem('hasSeenStorageNotice') === 'true' ||
+        localStorage.getItem('soulnote_has_seen_storage_notice') === 'true' ||
+        this.getSettings().hasSeenStorageNotice === true
+      );
+    } catch {
+      return false;
+    }
+  },
+
+  setSeenStorageNotice(): void {
+    try {
+      localStorage.setItem('hasSeenStorageNotice', 'true');
+      localStorage.setItem('soulnote_has_seen_storage_notice', 'true');
+      this.updateSettings({ hasSeenStorageNotice: true });
+    } catch (err) {
+      console.error('Failed to set hasSeenStorageNotice in localStorage', err);
+    }
   },
 
   // --- Reset & Deletion ---

@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { EmotionEntry, PrimaryEmotion, ContextTag } from '../types';
 import { EMOTIONS_LIST, CONTEXT_TAGS, getEmotionMeta, INTENSITY_LABELS } from '../data/emotions';
 import { Filter, Calendar, Tag, ChevronDown, Plus, RotateCcw } from 'lucide-react';
 import { Haptics } from '../services/haptics';
+import { EmptyStateJournal } from '../components/EmptyStateJournal';
 
 interface TimelineViewProps {
   entries: EmotionEntry[];
@@ -197,34 +199,8 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
       {/* Main List */}
       {entries.length === 0 ? (
-        /* Empty State */
-        <div className="p-12 rounded-3xl bg-[#F5F4F0] dark:bg-[#181816] border border-[#E8E6DF] dark:border-[#262622] text-center space-y-4 my-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#ECEAE3] dark:bg-[#242421] border border-[#E0DDD3] dark:border-[#2E2E2A] flex items-center justify-center mx-auto text-[#6F6D67] dark:text-[#9A9890]">
-            <Calendar className="w-6 h-6 stroke-[1.5]" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-serif text-xl font-medium text-[#1E1E1C] dark:text-[#EDEDEB]">
-              “Your emotional story starts here.”
-            </h3>
-            <p className="text-xs text-[#7C7A75] dark:text-[#8E8C85] max-w-sm mx-auto">
-              Whenever you feel something, take a few seconds to record it. Over time, honest reflection brings calm perspective.
-            </p>
-          </div>
-          <div className="pt-2">
-            <button
-              type="button"
-              id="timeline-empty-checkin-btn"
-              onClick={() => {
-                Haptics.success();
-                onOpenCheckIn();
-              }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1E1E1C] hover:bg-[#32322E] dark:bg-[#EDEDEB] dark:hover:bg-white text-[#FBFBFA] dark:text-[#121211] text-xs font-semibold tracking-wide transition-all shadow-xs cursor-pointer active:scale-95"
-            >
-              <Plus className="w-4 h-4 stroke-[2]" />
-              <span>Check in</span>
-            </button>
-          </div>
-        </div>
+        /* Empty State with thoughtfully written copy and friendly Lucide icons */
+        <EmptyStateJournal onOpenCheckIn={onOpenCheckIn} />
       ) : filteredEntries.length === 0 ? (
         /* Filter matched nothing */
         <div className="p-8 rounded-3xl bg-[#F5F4F0] dark:bg-[#181816] border border-[#E8E6DF] dark:border-[#262622] text-center space-y-3">
@@ -234,13 +210,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           <button
             type="button"
             onClick={resetFilters}
-            className="text-xs text-[#1E1E1C] dark:text-[#EDEDEB] font-medium underline cursor-pointer"
+            className="text-xs text-[#1E1E1C] dark:text-[#EDEDEB] font-medium underline cursor-pointer min-h-[44px] px-3 py-2"
           >
             Clear filters
           </button>
         </div>
       ) : (
-        /* Grouped timeline entries */
+        /* Grouped timeline entries with staggered entrance animations */
         <div className="space-y-6">
           {Object.entries(groupedEntries).map(([dateLabel, dayEntries]) => (
             <div key={dateLabel} className="space-y-2.5">
@@ -252,7 +228,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
 
               <div className="space-y-2.5">
-                {(dayEntries as EmotionEntry[]).map((entry) => {
+                {(dayEntries as EmotionEntry[]).map((entry, index) => {
                   const meta = getEmotionMeta(entry.emotion);
                   const timeStr = new Date(entry.createdAt).toLocaleTimeString([], {
                     hour: '2-digit',
@@ -260,14 +236,21 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   });
 
                   return (
-                    <button
+                    <motion.button
                       key={entry.id}
                       type="button"
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.28,
+                        delay: Math.min(index * 0.05, 0.4),
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
                       onClick={() => {
                         Haptics.selection();
                         onSelectEntry(entry);
                       }}
-                      className="w-full text-left p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] hover:border-[#D5D2C7] dark:hover:border-[#383832] transition-all cursor-pointer shadow-2xs group flex flex-col space-y-2"
+                      className="w-full text-left p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] hover:border-[#D5D2C7] dark:hover:border-[#383832] transition-all cursor-pointer shadow-2xs group flex flex-col space-y-2 min-h-[44px]"
                     >
                       {/* Top row: Emotion, intensity, time */}
                       <div className="flex items-center justify-between w-full">
@@ -317,7 +300,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                           ))}
                         </div>
                       )}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
