@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, EmotionEntry, ReflectionEntry } from '../types';
 import { StorageService } from '../services/storage';
+import { NotificationService } from '../services/notifications';
 import { Haptics } from '../services/haptics';
 import { ThemeService } from '../services/theme';
 import { downloadTxtExport, downloadPdfExport, downloadJsonExport } from '../services/export';
 import {
+  Bell,
   Sun,
   Moon,
   Monitor,
