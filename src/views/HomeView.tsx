@@ -61,7 +61,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   return (
     <div id="soulnote-home-view" className="space-y-7 pb-16 max-w-xl mx-auto">
       {/* 1. Date & Today's Status Header */}
-      <section className="space-y-2 pt-2">
+      <header className="space-y-2 pt-2">
         <div className="flex items-center justify-between text-xs text-[#7C7A75] dark:text-[#8E8C85]">
           <span className="font-medium tracking-wide uppercase">
             {now.toLocaleDateString(undefined, {
@@ -73,9 +73,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <span className="text-[11px]">Private • Offline</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-4xl font-medium tracking-tight text-[#1E1E1C] dark:text-[#EDEDEB]">
-          How is your heart today?
-        </h1>
+        <div className="space-y-1">
+          <h1 className="font-serif text-3xl sm:text-4xl font-medium tracking-tight text-[#1E1E1C] dark:text-[#EDEDEB]">
+            Understand How You Feel
+          </h1>
+          <p className="font-serif italic text-lg sm:text-xl text-[#6F6D67] dark:text-[#9A9890]">
+            How is your heart today?
+          </p>
+        </div>
 
         <div className="p-3.5 rounded-2xl bg-[#F2EFE9] dark:bg-[#1A1A18] border border-[#E6E4DC] dark:border-[#272723] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -101,7 +106,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </span>
           )}
         </div>
-      </section>
+      </header>
 
       {/* 2. Streak Counter (Lightweight, computed client-side) */}
       <section>
@@ -142,9 +147,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* 3. Recent Emotional Entries */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-serif text-xl font-medium text-[#1E1E1C] dark:text-[#EDEDEB]">
+          <h2 className="font-serif text-xl font-medium text-[#1E1E1C] dark:text-[#EDEDEB]">
             Recent Check-ins
-          </h3>
+          </h2>
           {entries.length > 0 && (
             <button
               type="button"
@@ -249,9 +254,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {entries.length > 0 && (
         <section className="p-5 rounded-3xl bg-[#F5F4F0] dark:bg-[#181816] border border-[#E8E6DF] dark:border-[#262622] space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-[#7C7A75] dark:text-[#8E8C85]">
+            <h2 className="text-[11px] font-semibold tracking-wider uppercase text-[#7C7A75] dark:text-[#8E8C85]">
               Objective 7-Day Summary
-            </span>
+            </h2>
             <button
               type="button"
               onClick={() => {
@@ -295,14 +300,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
       )}
 
-      {/* 5. Daily Human Reflection Prompt Callout */}
+      {/* 6. Daily Human Reflection Prompt Callout */}
       <section className="p-5 rounded-3xl bg-[#FAF9F5] dark:bg-[#171715] border border-[#EAE8E1] dark:border-[#262622] flex flex-col justify-between space-y-3">
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-xs text-[#7A7872] dark:text-[#8E8C85]">
             <Sparkles className="w-3.5 h-3.5 text-[#88867F]" />
-            <span className="font-medium tracking-wide uppercase text-[10px]">
+            <h2 className="font-medium tracking-wide uppercase text-[10px]">
               Daily Reflection Prompt
-            </span>
+            </h2>
           </div>
           <p className="font-serif text-base text-[#1E1E1C] dark:text-[#EDEDEB] italic leading-snug">
             “{dailyPrompt}”

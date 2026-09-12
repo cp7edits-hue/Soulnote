@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://soulnote-phi.vercel.app/sitemap.xml

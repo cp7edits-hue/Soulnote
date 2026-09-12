@@ -1,6 +1,6 @@
 {
-  "name": "SoulNote",
-  "description": "A minimal, privacy-first emotional journaling and self-reflection application.",
+  "name": "SoulNote — Understand How You Feel",
+  "description": "SoulNote is a simple, private, and completely free emotional journaling app that helps you check in with yourself, record your emotions, and understand your emotional patterns over time.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

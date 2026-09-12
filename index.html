@@ -3,12 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SoulNote</title>
-    <meta name="description" content="A minimal, privacy-first emotional journaling and self-reflection application." />
-    <meta property="og:title" content="SoulNote" />
-    <meta property="og:description" content="A minimal, privacy-first emotional journaling and self-reflection application." />
+    <title>SoulNote — Understand How You Feel</title>
+    <meta name="description" content="SoulNote is a simple, private, and completely free emotional journaling app that helps you check in with yourself, record your emotions, and understand your emotional patterns over time." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://soulnote-phi.vercel.app/" />
+
+    <!-- Open Graph Metadata -->
     <meta property="og:type" content="website" />
+    <meta property="og:title" content="SoulNote — Understand How You Feel" />
+    <meta property="og:description" content="A simple, private, and completely free emotional journaling app designed to help you understand how you feel." />
+    <meta property="og:url" content="https://soulnote-phi.vercel.app/" />
+    <meta property="og:image" content="https://soulnote-phi.vercel.app/icon-512.png" />
+
+    <!-- Twitter/X Card Metadata -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SoulNote — Understand How You Feel" />
+    <meta name="twitter:description" content="A simple, private, and completely free emotional journaling app designed to help you understand how you feel." />
+    <meta name="twitter:image" content="https://soulnote-phi.vercel.app/icon-512.png" />
+
     <meta name="google-site-verification" content="obRoX7TGnQMgaIyzL-vUXSlL3_3eQzg_SyyswmXIKv4" />
     <meta name="theme-color" content="#1E1E1C" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -21,6 +33,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SoulNote",
+        "alternateName": "SoulNote — Understand How You Feel",
+        "url": "https://soulnote-phi.vercel.app/",
+        "description": "SoulNote is a simple, private, and completely free emotional journaling app that helps you check in with yourself, record your emotions, and understand your emotional patterns over time.",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "All",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
     <script>
       (function() {
         try {
@@ -41,6 +70,13 @@
   </head>
   <body class="bg-[#FBFBFA] dark:bg-[#121211] text-[#1E1E1C] dark:text-[#EDEDEB] font-sans antialiased selection:bg-[#E8E6DF] dark:selection:bg-[#2C2C29]">
     <div id="root"></div>
+    <noscript>
+      <div style="padding: 2rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6; color: #1E1E1C;">
+        <h1>SoulNote — Understand How You Feel</h1>
+        <p>SoulNote is a simple, private, and completely free emotional journaling app that helps you check in with yourself, record your emotions, and understand your emotional patterns over time.</p>
+        <p>Please enable JavaScript to run the application.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

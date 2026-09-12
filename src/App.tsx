@@ -10,7 +10,6 @@ import {
   ContextTag,
 } from './types';
 import { StorageService } from './services/storage';
-import { NotificationService } from './services/notifications';
 import { ThemeService } from './services/theme';
 import { SplashIntro } from './components/SplashIntro';
 import { OnboardingModal } from './components/OnboardingModal';
@@ -126,16 +125,6 @@ export default function App() {
   useEffect(() => {
     ThemeService.applyTheme(settings.theme);
   }, [settings.theme]);
-
-  // Notifications scheduler
-  useEffect(() => {
-    if (settings.remindersEnabled) {
-      NotificationService.startScheduler();
-    } else {
-      NotificationService.stopScheduler();
-    }
-    return () => NotificationService.stopScheduler();
-  }, [settings.remindersEnabled, settings.reminderTime]);
 
   // Update Settings
   const handleUpdateSettings = (updates: Partial<UserSettings>) => {

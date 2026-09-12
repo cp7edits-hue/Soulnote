@@ -3,7 +3,6 @@ import { ReflectionEntry } from '../types';
 import { CURATED_REFLECTION_PROMPTS, PROMPT_CATEGORIES } from '../data/reflectionPrompts';
 import { BookOpen, Sparkles, Plus, Trash2, Edit2, Check, RefreshCw, Calendar } from 'lucide-react';
 import { Haptics } from '../services/haptics';
-import { MindfulPerspectiveCard } from '../components/MindfulPerspectiveCard';
 
 interface ReflectionViewProps {
   reflections: ReflectionEntry[];
@@ -190,9 +189,6 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
               </div>
             )}
           </div>
-
-          {/* Optional AI Mindful Perspective (Data Minimization applied: only sends prompt topic) */}
-          <MindfulPerspectiveCard promptText={currentPrompt} />
 
           {/* Reflection Writing Box */}
           <div className="p-6 rounded-3xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] shadow-2xs space-y-4">

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, EmotionEntry, ReflectionEntry } from '../types';
 import { StorageService } from '../services/storage';
-import { NotificationService } from '../services/notifications';
 import { Haptics } from '../services/haptics';
 import { ThemeService } from '../services/theme';
 import { downloadTxtExport, downloadPdfExport, downloadJsonExport } from '../services/export';
 import {
-  Bell,
   Sun,
   Moon,
   Monitor,
@@ -52,9 +50,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   entriesCount,
   reflectionsCount,
 }) => {
-  const [notificationPermission, setNotificationPermission] = useState<
-    NotificationPermission | 'unsupported'
-  >(NotificationService.getPermission());
   const [hasBiometrics, setHasBiometrics] = useState<boolean>(false);
   const [showPinSetup, setShowPinSetup] = useState<boolean>(false);
   const [newPin, setNewPin] = useState<string>('');
@@ -70,36 +65,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         .catch(() => setHasBiometrics(false));
     }
   }, []);
-
-  // Notifications Toggle
-  const handleToggleNotifications = async () => {
-    Haptics.selection();
-    if (!settings.remindersEnabled) {
-      const perm = await NotificationService.requestPermission();
-      setNotificationPermission(perm);
-      if (perm === 'granted') {
-        onUpdateSettings({ remindersEnabled: true });
-        NotificationService.startScheduler();
-      } else {
-        alert('Please allow notification permissions in your browser to enable reminders.');
-      }
-    } else {
-      onUpdateSettings({ remindersEnabled: false });
-      NotificationService.stopScheduler();
-    }
-  };
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdateSettings({ reminderTime: e.target.value });
-  };
-
-  const handleTestNotification = () => {
-    Haptics.selection();
-    const sent = NotificationService.sendTestNotification();
-    if (!sent) {
-      alert('Could not trigger notification. Ensure browser permissions are granted.');
-    }
-  };
 
   // Theme change
   const handleSelectTheme = (theme: 'system' | 'light' | 'dark') => {
@@ -198,73 +163,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       )}
 
-      {/* 1. NOTIFICATIONS & REMINDERS */}
-      <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] space-y-4">
-        <div className="flex items-center gap-2">
-          <Bell className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
-          <h2 className="font-serif text-lg font-medium text-[#1E1E1C] dark:text-[#EDEDEB]">
-            Daily Gentle Reminder
-          </h2>
-        </div>
-        <p className="text-xs text-[#6F6D67] dark:text-[#9A9890] leading-relaxed">
-          One quiet local notification per day to invite self-awareness. No streaks, no guilt, and scheduled strictly on your device.
-        </p>
-
-        <div className="space-y-3 pt-1">
-          {/* Toggle */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-[#2D2C2A] dark:text-[#DFDDD7]">
-              Enable Daily Reminder
-            </span>
-            <button
-              type="button"
-              id="reminder-toggle-btn"
-              onClick={handleToggleNotifications}
-              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
-                settings.remindersEnabled
-                  ? 'bg-[#1E1E1C] dark:bg-[#EDEDEB]'
-                  : 'bg-[#E4E2D8] dark:bg-[#2C2C28]'
-              }`}
-            >
-              <div
-                className={`bg-white dark:bg-[#121211] w-4 h-4 rounded-full shadow-xs transform transition-transform ${
-                  settings.remindersEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Time Selector */}
-          {settings.remindersEnabled && (
-            <div className="flex items-center justify-between pt-2 border-t border-[#F0EEE8] dark:border-[#22221F]">
-              <span className="text-xs text-[#52504A] dark:text-[#A6A49D]">
-                Reminder Time
-              </span>
-              <input
-                type="time"
-                value={settings.reminderTime}
-                onChange={handleTimeChange}
-                className="text-xs font-medium py-1 px-2.5 rounded-lg bg-[#FAF9F5] dark:bg-[#20201D] border border-[#E0DDD3] dark:border-[#2C2C28] text-[#1E1E1C] dark:text-[#EDEDEB] cursor-pointer"
-              />
-            </div>
-          )}
-
-          {/* Test Notification Button */}
-          {settings.remindersEnabled && (
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={handleTestNotification}
-                className="text-xs text-[#52504A] hover:text-[#1E1E1C] dark:text-[#A6A49D] dark:hover:text-[#EDEDEB] underline cursor-pointer"
-              >
-                Send test notification now
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 2. THEME SELECTION */}
+      {/* 1. THEME SELECTION */}
       <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#181816] border border-[#EAE8E1] dark:border-[#262622] space-y-4">
         <div className="flex items-center gap-2">
           <Sun className="w-4 h-4 text-[#7C7A75] dark:text-[#8E8C85]" />
