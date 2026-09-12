@@ -1,10 +1,11 @@
-// SoulNote Service Worker v1.0.1
-const CACHE_NAME = 'soulnote-cache-v2';
+// SoulNote Service Worker v1.0.2
+const CACHE_NAME = 'soulnote-cache-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.svg',
+  '/favicon.ico',
+  '/icon-32.png',
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
