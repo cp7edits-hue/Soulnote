@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" width="420" height="100">
+  <!-- SoulNote Emblem -->
+  <g transform="translate(10, 10) scale(0.15625)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="256" cy="256" r="16" fill="currentColor" stroke="none"/>
+    <path d="M 288 188 A 72 72 0 1 0 288 324" stroke-width="16"/>
+    <path d="M 338 138 A 142 142 0 0 0 114 256 C 114 336 182 402 256 402 C 318 402 366 366 380 314" stroke-width="16"/>
+  </g>
+  <!-- Wordmark "SoulNote" in refined serif -->
+  <text x="104" y="64" font-family="'Newsreader', 'Playfair Display', Georgia, serif" font-size="46" font-weight="500" letter-spacing="-0.02em" fill="currentColor">SoulNote</text>
+</svg>

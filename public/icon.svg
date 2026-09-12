@@ -1,14 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#1E1E1C"/>
-  <circle cx="256" cy="256" r="160" fill="#292926"/>
-  <!-- SoulNote Journal & Heart Motif -->
-  <g transform="translate(136, 126) scale(0.95)" fill="none" stroke="#EDEDEB" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Stylized open journal pages -->
-    <path d="M 126 50 C 70 30, 20 45, 10 55 L 10 195 C 20 185, 70 170, 126 190 Z" fill="#2C2C28" stroke="#EDEDEB" stroke-width="14"/>
-    <path d="M 126 50 C 182 30, 232 45, 242 55 L 242 195 C 232 185, 182 170, 126 190 Z" fill="#2C2C28" stroke="#EDEDEB" stroke-width="14"/>
-    <!-- Spine -->
-    <line x1="126" y1="50" x2="126" y2="190" stroke="#EDEDEB" stroke-width="14"/>
-    <!-- Heart gently rising from center of pages -->
-    <path d="M 126 115 C 126 115, 86 70, 86 42 C 86 24, 100 12, 114 12 C 122 12, 126 20, 126 20 C 126 20, 130 12, 138 12 C 152 12, 166 24, 166 42 C 166 70, 126 115, 126 115 Z" fill="#E8B4B8" stroke="#F5D0D3" stroke-width="8"/>
+  <rect width="512" height="512" rx="112" fill="#181816"/>
+  <g fill="none" stroke="#FAF8F4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Central Core / Soul Wellspring -->
+    <circle cx="256" cy="256" r="16" fill="#FAF8F4" stroke="none"/>
+
+    <!-- Inner Crescent Resonance -->
+    <path d="M 288 188 A 72 72 0 1 0 288 324" stroke-width="15"/>
+
+    <!-- Outer Swirling Spiral / SoulNote Enso -->
+    <path d="M 338 138 A 142 142 0 0 0 114 256 C 114 336 182 402 256 402 C 318 402 366 366 380 314" stroke-width="15"/>
   </g>
 </svg>
